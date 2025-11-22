@@ -1,0 +1,76 @@
+<div class="dice-roller-container">
+  <h3 class="dice-title">🎲 Dice Roller</h3>
+  
+  <!-- Multi-Dice Configuration -->
+  <div class="dice-config">
+    <div class="config-group">
+      <label>Count:</label>
+      <input type="number" [(ngModel)]="diceCount" min="1" max="20" class="config-input">
+    </div>
+    <div class="config-group">
+      <label>Modifier:</label>
+      <input type="number" [(ngModel)]="modifier" class="config-input">
+    </div>
+  </div>
+  
+  <!-- Dice Display Area -->
+  <div class="dice-display">
+    <div *ngIf="multiResults().length > 0" class="multi-dice-display">
+      <div *ngFor="let result of multiResults(); let i = index" 
+           class="mini-dice"
+           [class.rolling]="isRolling()"
+           [style.backgroundColor]="getDiceColor(diceType())">
+        {{ result }}
+      </div>
+      <div *ngIf="modifier() !== 0" class="modifier-display">
+        {{ modifier() > 0 ? '+' : '' }}{{ modifier() }}
+      </div>
+    </div>
+    
+    <div class="dice-wrapper" [class.rolling]="isRolling()">
+      <div class="dice-face" 
+           [class.critical]="currentResult() && diceCount() === 1 && isCritical(currentResult()!, diceType())"
+           [class.critical-fail]="currentResult() && diceCount() === 1 && isCriticalFail(currentResult()!)"
+           [style.backgroundColor]="getDiceColor(diceType())">
+        <span class="dice-result">
+          {{ currentResult() ?? '?' }}
+        </span>
+      </div>
+    </div>
+    <div class="dice-label">
+      {{ diceCount() }}d{{ diceType() }}{{ modifier() !== 0 ? (modifier() > 0 ? '+' : '') + modifier() : '' }}
+    </div>
+  </div>
+
+  <!-- Dice Selection Buttons -->
+  <div class="dice-buttons">
+    <button 
+      *ngFor="let die of [4, 6, 8, 10, 12, 20]" 
+      class="dice-btn"
+      [class.active]="diceType() === die"
+      [disabled]="isRolling()"
+      (click)="rollDice(die, diceCount(), modifier())"
+      [style.borderColor]="getDiceColor(die)">
+      d{{ die }}
+    </button>
+  </div>
+
+  <!-- Roll History -->
+  <div class="roll-history" *ngIf="rollHistory().length > 0">
+    <div class="history-header">
+      <span>Recent Rolls</span>
+      <button class="clear-btn" (click)="clearHistory()">Clear</button>
+    </div>
+    <div class="history-items">
+      <div *ngFor="let roll of rollHistory()" class="history-item"
+           [class.critical]="roll.count === 1 && isCritical(roll.result, roll.type)"
+           [class.critical-fail]="roll.count === 1 && isCriticalFail(roll.result)">
+        <span class="history-dice">{{ roll.count }}d{{ roll.type }}{{ roll.modifier !== 0 ? (roll.modifier! > 0 ? '+' : '') + roll.modifier : '' }}</span>
+        <span class="history-detail" *ngIf="roll.individual">
+          [{{ roll.individual.join(', ') }}]{{ roll.modifier !== 0 ? (roll.modifier! > 0 ? ' +' : ' ') + roll.modifier : '' }}
+        </span>
+        <span class="history-result">= {{ roll.result }}</span>
+      </div>
+    </div>
+  </div>
+</div>

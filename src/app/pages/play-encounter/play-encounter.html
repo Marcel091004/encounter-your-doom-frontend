@@ -1,0 +1,167 @@
+<div class="container">
+  <div class="back-link">
+    <a routerLink="/my-encounters" class="btn btn-secondary">← Back to My Encounters</a>
+  </div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="loading" class="loading">Loading encounter...</div>
+
+  <div *ngIf="!loading && encounter" class="encounter-play">
+    <div class="encounter-header">
+      <h1 class="encounter-title">{{ encounter.name }}</h1>
+      
+      <div class="encounter-meta">
+        <div *ngIf="encounter.difficultyLevel" class="meta-badge difficulty" [class]="'difficulty-' + encounter.difficultyLevel.toLowerCase()">
+          🎯 {{ formatDifficulty(encounter.difficultyLevel) }}
+        </div>
+        <div *ngIf="encounter.partyLevel" class="meta-badge party-level">
+          👥 Party Level {{ encounter.partyLevel }}
+        </div>
+        <div *ngIf="encounter.region" class="meta-badge region">
+          🗺️ {{ formatRegion(encounter.region) }}
+        </div>
+        <div *ngIf="encounter.rarity" class="meta-badge rarity" [class]="'rarity-' + encounter.rarity.toLowerCase()">
+          ✨ {{ formatRarity(encounter.rarity) }}
+        </div>
+      </div>
+    </div>
+
+    <div class="combat-action">
+      <button 
+        (click)="startCombat()" 
+        [disabled]="starting"
+        class="btn btn-combat">
+        {{ starting ? '⏳ Starting Combat...' : '🎲 Start Combat' }}
+      </button>
+    </div>
+
+    <div *ngIf="encounter.description" class="encounter-description-section">
+      <h2>📖 Description</h2>
+      <p class="description-text">{{ encounter.description }}</p>
+    </div>
+
+    <div *ngIf="encounter.creatures && encounter.creatures.length > 0" class="creatures-section">
+      <h2>⚔️ Creatures in this Encounter</h2>
+      
+      <div class="creatures-grid">
+        <div *ngFor="let creature of encounter.creatures" class="creature-detail-card">
+          <div class="creature-card-header">
+            <h3 class="creature-name">{{ creature.name }}</h3>
+            <div *ngIf="creature.cr" class="creature-cr">CR {{ creature.cr }}</div>
+          </div>
+
+          <div class="creature-badges">
+            <div *ngIf="creature.Region || creature.region" class="badge-small region">
+              🗺️ {{ getCreatureRegion(creature) }}
+            </div>
+            <div *ngIf="creature.Rarity || creature.rarity" class="badge-small rarity" [ngClass]="getRarityClass(creature)">
+              ✨ {{ getCreatureRarity(creature) }}
+            </div>
+          </div>
+
+          <div *ngIf="creature.description || creature.CreatureDescription" class="creature-description">
+            {{ creature.description || creature.CreatureDescription }}
+          </div>
+
+          <div class="creature-stats" *ngIf="creature.HP || creature.AC || creature.speed || creature.Speed || creature.initiative !== undefined">
+            <div *ngIf="creature.HP" class="stat-item">
+              <span class="stat-label">Hit Points</span>
+              <span class="stat-value">{{ creature.HP }}</span>
+            </div>
+            <div *ngIf="creature.AC" class="stat-item">
+              <span class="stat-label">Armor Class</span>
+              <span class="stat-value">{{ creature.AC }}</span>
+            </div>
+            <div *ngIf="creature.speed || creature.Speed" class="stat-item">
+              <span class="stat-label">Speed</span>
+              <span class="stat-value">{{ creature.Speed || creature.speed }} ft</span>
+            </div>
+            <div *ngIf="creature.initiative !== undefined" class="stat-item">
+              <span class="stat-label">Initiative</span>
+              <span class="stat-value">{{ creature.initiative >= 0 ? '+' : '' }}{{ creature.initiative }}</span>
+            </div>
+          </div>
+
+          <div class="abilities-grid" *ngIf="creature.abilities || creature.statBlock">
+            <!-- New statBlock format -->
+            <div *ngIf="creature.statBlock" class="ability-box">
+              <span class="ability-name">STR</span>
+              <span class="ability-score">{{ creature.statBlock.Str >= 0 ? '+' : '' }}{{ creature.statBlock.Str }}</span>
+            </div>
+            <div *ngIf="creature.statBlock" class="ability-box">
+              <span class="ability-name">DEX</span>
+              <span class="ability-score">{{ creature.statBlock.Dex >= 0 ? '+' : '' }}{{ creature.statBlock.Dex }}</span>
+            </div>
+            <div *ngIf="creature.statBlock" class="ability-box">
+              <span class="ability-name">CON</span>
+              <span class="ability-score">{{ creature.statBlock.Con >= 0 ? '+' : '' }}{{ creature.statBlock.Con }}</span>
+            </div>
+            <div *ngIf="creature.statBlock" class="ability-box">
+              <span class="ability-name">INT</span>
+              <span class="ability-score">{{ creature.statBlock.Int >= 0 ? '+' : '' }}{{ creature.statBlock.Int }}</span>
+            </div>
+            <div *ngIf="creature.statBlock" class="ability-box">
+              <span class="ability-name">WIS</span>
+              <span class="ability-score">{{ creature.statBlock.Wis >= 0 ? '+' : '' }}{{ creature.statBlock.Wis }}</span>
+            </div>
+            <div *ngIf="creature.statBlock" class="ability-box">
+              <span class="ability-name">CHA</span>
+              <span class="ability-score">{{ creature.statBlock.Cha >= 0 ? '+' : '' }}{{ creature.statBlock.Cha }}</span>
+            </div>
+            <!-- Legacy abilities format -->
+            <div *ngIf="!creature.statBlock && creature.abilities?.strength !== undefined" class="ability-box">
+              <span class="ability-name">STR</span>
+              <span class="ability-score">{{ creature.abilities!.strength }}</span>
+            </div>
+            <div *ngIf="!creature.statBlock && creature.abilities?.dexterity !== undefined" class="ability-box">
+              <span class="ability-name">DEX</span>
+              <span class="ability-score">{{ creature.abilities!.dexterity }}</span>
+            </div>
+            <div *ngIf="!creature.statBlock && creature.abilities?.constitution !== undefined" class="ability-box">
+              <span class="ability-name">CON</span>
+              <span class="ability-score">{{ creature.abilities!.constitution }}</span>
+            </div>
+            <div *ngIf="!creature.statBlock && creature.abilities?.intelligence !== undefined" class="ability-box">
+              <span class="ability-name">INT</span>
+              <span class="ability-score">{{ creature.abilities!.intelligence }}</span>
+            </div>
+            <div *ngIf="!creature.statBlock && creature.abilities?.wisdom !== undefined" class="ability-box">
+              <span class="ability-name">WIS</span>
+              <span class="ability-score">{{ creature.abilities!.wisdom }}</span>
+            </div>
+            <div *ngIf="!creature.statBlock && creature.abilities?.charisma !== undefined" class="ability-box">
+              <span class="ability-name">CHA</span>
+              <span class="ability-score">{{ creature.abilities!.charisma }}</span>
+            </div>
+          </div>
+
+          <div class="attacks-section" *ngIf="(creature.attacks && creature.attacks.length > 0) || (creature.attack && creature.attack.length > 0)">
+            <h4 class="attacks-title">⚔️ Attacks</h4>
+            <div class="attacks-list">
+              <div *ngFor="let attack of (creature.attack || creature.attacks)" class="attack-item">
+                <div class="attack-header">
+                  <span class="attack-name">{{ attack.name }}</span>
+                  <span *ngIf="attack.attackBonus" class="attack-bonus">+{{ attack.attackBonus }} to hit</span>
+                </div>
+                <div class="attack-details">
+                  <span *ngIf="attack.damage" class="attack-damage">
+                    💥 {{ attack.damage }}
+                    <span *ngIf="attack.damageType" class="damage-type">({{ formatDamageType(attack.damageType) }})</span>
+                  </span>
+                  <span *ngIf="attack.range" class="attack-range">🎯 Range: {{ attack.range }}</span>
+                </div>
+                <div *ngIf="attack.description" class="attack-description">{{ attack.description }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="battle-ready">
+      <h2>⚔️ Ready for Battle!</h2>
+      <p>Use this encounter information to run an epic battle for your party. May the dice be ever in your favor!</p>
+    </div>
+  </div>
+</div>

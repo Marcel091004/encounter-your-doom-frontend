@@ -1,0 +1,259 @@
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">⚔️ Public Encounters</h1>
+    <a routerLink="/create-encounter" class="btn btn-create">✨ Create Encounter</a>
+  </div>
+
+  <div class="filters">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="region">Region</label>
+        <select id="region" [(ngModel)]="selectedRegion" (change)="loadEncounters()">
+          <option value="">All Regions</option>
+          <option *ngFor="let region of regions" [value]="region">
+            {{ formatRegion(region) }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="rarity">Rarity</label>
+        <select id="rarity" [(ngModel)]="selectedRarity" (change)="loadEncounters()">
+          <option value="">All Rarities</option>
+          <option *ngFor="let rarity of rarities" [value]="rarity">
+            {{ formatRarity(rarity) }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="difficulty">Difficulty</label>
+        <select id="difficulty" [(ngModel)]="selectedDifficulty" (change)="loadEncounters()">
+          <option value="">All Difficulties</option>
+          <option *ngFor="let diff of difficulties" [value]="diff">
+            {{ formatDifficulty(diff) }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="partyLevel">Party Level</label>
+        <input
+          type="number"
+          id="partyLevel"
+          [(ngModel)]="selectedPartyLevel"
+          (change)="loadEncounters()"
+          placeholder="1-20"
+          min="1"
+          max="20"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label>&nbsp;</label>
+        <button class="btn btn-secondary" (click)="clearFilters()">Clear</button>
+      </div>
+
+      <div class="filter-group">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" (click)="getRandomEncounter()">🎲 Random</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+
+  <div *ngIf="loading" class="loading">Loading encounters...</div>
+
+  <div *ngIf="!loading && encounters.length === 0" class="no-results">
+    <p>No encounters found. Try adjusting your filters.</p>
+  </div>
+
+  <div *ngIf="!loading && encounters.length > 0" class="grid grid-2">
+    <div *ngFor="let encounter of encounters" class="encounter-card" (click)="openEncounterModal(encounter)">
+      <div class="encounter-header">
+        <h3 class="encounter-name">{{ encounter.name }}</h3>
+      </div>
+
+      <div class="encounter-badges">
+        <div *ngIf="encounter.difficultyLevel" class="badge difficulty" [class]="'difficulty-' + encounter.difficultyLevel.toLowerCase()">
+          🎯 {{ formatDifficulty(encounter.difficultyLevel) }}
+        </div>
+        <div *ngIf="encounter.partyLevel" class="badge party-level">
+          👥 Party Level {{ encounter.partyLevel }}
+        </div>
+      </div>
+
+      <div class="encounter-info">
+        <div *ngIf="encounter.region" class="info-badge region">
+          <span class="badge-icon">🗺️</span>
+          {{ formatRegion(encounter.region) }}
+        </div>
+        <div *ngIf="encounter.rarity" class="info-badge rarity" [class]="'rarity-' + encounter.rarity.toLowerCase()">
+          <span class="badge-icon">✨</span>
+          {{ formatRarity(encounter.rarity) }}
+        </div>
+      </div>
+
+      <div *ngIf="encounter.description" class="encounter-description">
+        {{ encounter.description }}
+      </div>
+
+      <div *ngIf="encounter.creatures && encounter.creatures.length > 0" class="creatures-list">
+        <h4>Creatures:</h4>
+        <div class="creature-tags">
+          <span *ngFor="let creature of encounter.creatures" class="creature-tag">
+            🐉 {{ creature.name }}
+          </span>
+        </div>
+      </div>
+
+      <div class="encounter-actions">
+        <button class="btn btn-primary" (click)="copyToPrivate(encounter); $event.stopPropagation()">
+          📥 Copy to My Encounters
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Encounter Modal -->
+  <app-modal [isOpen]="isModalOpen" [title]="selectedEncounter?.name || ''" (closeModal)="closeModal()">
+    <div *ngIf="selectedEncounter" class="modal-encounter-details">
+      <div class="modal-header-info">
+        <div class="modal-badges-row">
+          <div *ngIf="selectedEncounter.difficultyLevel" class="modal-badge difficulty" [class]="'difficulty-' + selectedEncounter.difficultyLevel.toLowerCase()">
+            🎯 {{ formatDifficulty(selectedEncounter.difficultyLevel) }}
+          </div>
+          <div *ngIf="selectedEncounter.partyLevel" class="modal-badge party-level">
+            👥 Party Level {{ selectedEncounter.partyLevel }}
+          </div>
+          <div *ngIf="selectedEncounter.region" class="modal-badge region">
+            🗺️ {{ formatRegion(selectedEncounter.region) }}
+          </div>
+          <div *ngIf="selectedEncounter.rarity" class="modal-badge rarity" [class]="'rarity-' + selectedEncounter.rarity.toLowerCase()">
+            ✨ {{ formatRarity(selectedEncounter.rarity) }}
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="selectedEncounter.description" class="modal-description">
+        <h3>Description</h3>
+        <p>{{ selectedEncounter.description }}</p>
+      </div>
+
+      <div *ngIf="selectedEncounter.creatures && selectedEncounter.creatures.length > 0" class="modal-creatures">
+        <h3>🐉 Creatures in this Encounter ({{ selectedEncounter.creatures.length }})</h3>
+        <div class="modal-creatures-grid">
+          <div *ngFor="let creature of selectedEncounter.creatures" class="modal-creature-card" (click)="openCreatureModal(creature); $event.stopPropagation()" style="cursor: pointer;">
+            <div class="modal-creature-header">
+              <span class="modal-creature-name">{{ creature.name }}</span>
+              <span *ngIf="creature.cr" class="modal-creature-cr">CR {{ creature.cr }}</span>
+            </div>
+            
+            <div class="modal-creature-stats">
+              <span *ngIf="creature.HP" class="stat-badge">❤️ {{ creature.HP }} HP</span>
+              <span *ngIf="creature.AC" class="stat-badge">🛡️ AC {{ creature.AC }}</span>
+              <span *ngIf="creature.Speed" class="stat-badge">⚡ {{ creature.Speed }} ft</span>
+            </div>
+            
+            <div *ngIf="creature.Region || creature.region || creature.Rarity || creature.rarity" class="modal-creature-tags">
+              <span *ngIf="creature.Region || creature.region" class="creature-tag-small">{{ getCreatureRegion(creature) }}</span>
+              <span *ngIf="creature.Rarity || creature.rarity" class="creature-tag-small">{{ getCreatureRarity(creature) }}</span>
+            </div>
+            
+            <div *ngIf="creature.attack && creature.attack.length > 0" class="creature-quick-attacks">
+              <span class="attacks-label">⚔️ {{ creature.attack.length }} attack{{creature.attack.length > 1 ? 's' : ''}}</span>
+            </div>
+            
+            <div class="click-hint">Click for details</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-primary btn-large" (click)="copyToPrivateFromModal(selectedEncounter)">
+          📥 Copy to My Encounters
+        </button>
+      </div>
+    </div>
+  </app-modal>
+
+  <!-- Creature Detail Modal -->
+  <app-modal [isOpen]="isCreatureModalOpen" [title]="selectedCreature?.name || ''" (closeModal)="closeCreatureModal()">
+    <div *ngIf="selectedCreature" class="creature-details">
+      <!-- Basic Stats -->
+      <div class="stats-section">
+        <h3>📊 Stats</h3>
+        <div class="stats-grid">
+          <div class="stat-item"><strong>HP:</strong> {{ selectedCreature.HP }}</div>
+          <div class="stat-item"><strong>AC:</strong> {{ selectedCreature.AC }}</div>
+          <div class="stat-item"><strong>Speed:</strong> {{ selectedCreature.Speed }} ft</div>
+          <div class="stat-item"><strong>Initiative:</strong> +{{ selectedCreature.initiative }}</div>
+          <div class="stat-item"><strong>CR:</strong> {{ selectedCreature.cr }}</div>
+        </div>
+      </div>
+
+      <!-- Stat Block -->
+      <div *ngIf="selectedCreature.statBlock" class="stats-section">
+        <h3>💪 Ability Scores</h3>
+        <div class="ability-grid">
+          <div class="ability"><strong>STR</strong><br>{{ selectedCreature.statBlock.Str >= 0 ? '+' : '' }}{{ selectedCreature.statBlock.Str }}</div>
+          <div class="ability"><strong>DEX</strong><br>{{ selectedCreature.statBlock.Dex >= 0 ? '+' : '' }}{{ selectedCreature.statBlock.Dex }}</div>
+          <div class="ability"><strong>CON</strong><br>{{ selectedCreature.statBlock.Con >= 0 ? '+' : '' }}{{ selectedCreature.statBlock.Con }}</div>
+          <div class="ability"><strong>INT</strong><br>{{ selectedCreature.statBlock.Int >= 0 ? '+' : '' }}{{ selectedCreature.statBlock.Int }}</div>
+          <div class="ability"><strong>WIS</strong><br>{{ selectedCreature.statBlock.Wis >= 0 ? '+' : '' }}{{ selectedCreature.statBlock.Wis }}</div>
+          <div class="ability"><strong>CHA</strong><br>{{ selectedCreature.statBlock.Cha >= 0 ? '+' : '' }}{{ selectedCreature.statBlock.Cha }}</div>
+        </div>
+      </div>
+
+      <!-- Attacks -->
+      <div *ngIf="selectedCreature.attack && selectedCreature.attack.length > 0" class="stats-section">
+        <h3>⚔️ Attacks</h3>
+        <div class="attacks-list">
+          <div *ngFor="let attack of selectedCreature.attack" class="attack-card">
+            <div class="attack-name">{{ attack.name }}</div>
+            <div class="attack-details">
+              <span *ngIf="attack.attackBonus" class="attack-bonus">+{{ attack.attackBonus }} to hit</span>
+              <span *ngIf="attack.damage" class="attack-damage">{{ attack.damage }}</span>
+              <span *ngIf="attack.damageType" class="attack-type">{{ attack.damageType }}</span>
+              <span *ngIf="attack.range" class="attack-range">{{ attack.range }}</span>
+            </div>
+            <div *ngIf="attack.description" class="attack-description">{{ attack.description }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Defenses -->
+      <div *ngIf="(selectedCreature.resistances && selectedCreature.resistances.length > 0) || (selectedCreature.immunities && selectedCreature.immunities.length > 0) || (selectedCreature.weaknesses && selectedCreature.weaknesses.length > 0)" class="stats-section">
+        <h3>🛡️ Defenses</h3>
+        <div *ngIf="selectedCreature.resistances && selectedCreature.resistances.length > 0" class="defense-row">
+          <strong>Resistances:</strong>
+          <span *ngFor="let resistance of selectedCreature.resistances" class="defense-badge resistance">{{ resistance }}</span>
+        </div>
+        <div *ngIf="selectedCreature.immunities && selectedCreature.immunities.length > 0" class="defense-row">
+          <strong>Immunities:</strong>
+          <span *ngFor="let immunity of selectedCreature.immunities" class="defense-badge immunity">{{ immunity }}</span>
+        </div>
+        <div *ngIf="selectedCreature.weaknesses && selectedCreature.weaknesses.length > 0" class="defense-row">
+          <strong>Weaknesses:</strong>
+          <span *ngFor="let weakness of selectedCreature.weaknesses" class="defense-badge weakness">{{ weakness }}</span>
+        </div>
+      </div>
+
+      <!-- Traits -->
+      <div *ngIf="selectedCreature.traits && selectedCreature.traits.length > 0" class="stats-section">
+        <h3>✨ Special Traits</h3>
+        <div class="traits-list">
+          <div *ngFor="let trait of selectedCreature.traits" class="trait-item">{{ trait }}</div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div *ngIf="selectedCreature.CreatureDescription" class="stats-section">
+        <h3>📖 Description</h3>
+        <p>{{ selectedCreature.CreatureDescription }}</p>
+      </div>
+    </div>
+  </app-modal>
+</div>

@@ -1,0 +1,385 @@
+<div class="container">
+  <div class="form-header">
+    <h1 class="page-title">✨ Create New Creature</h1>
+    <p class="subtitle">Bring your custom creature to life!</p>
+  </div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+
+  <form class="creature-form" (ngSubmit)="createCreature()">
+    <!-- Basic Information Section -->
+    <div class="form-section">
+      <h2 class="section-title">📋 Basic Information</h2>
+      
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="name">Creature Name *</label>
+          <input
+            type="text"
+            id="name"
+            [(ngModel)]="creature.name"
+            name="name"
+            placeholder="e.g., Ancient Red Dragon"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            [(ngModel)]="creature.description"
+            name="description"
+            rows="4"
+            placeholder="Describe this creature's appearance, behavior, and lore..."
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cr">Challenge Rating (CR) *</label>
+          <input
+            type="text"
+            id="cr"
+            [(ngModel)]="creature.cr"
+            name="cr"
+            placeholder="e.g., 1, 1/2, 5, 20"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="Region">Region</label>
+          <select id="Region" [(ngModel)]="creature.Region" name="Region">
+            <option [ngValue]="undefined">Select Region</option>
+            <option *ngFor="let region of regions" [value]="region">
+              {{ formatRegion(region) }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="Rarity">Rarity</label>
+          <select id="Rarity" [(ngModel)]="creature.Rarity" name="Rarity">
+            <option [ngValue]="undefined">Select Rarity</option>
+            <option *ngFor="let rarity of rarities" [value]="rarity">
+              {{ formatRarity(rarity) }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Combat Stats Section -->
+    <div class="form-section">
+      <h2 class="section-title">⚔️ Combat Statistics</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="HP">Hit Points (HP) *</label>
+          <input
+            type="number"
+            id="HP"
+            [(ngModel)]="creature.HP"
+            name="HP"
+            placeholder="30"
+            min="1"
+            max="1000"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="AC">Armor Class (AC) *</label>
+          <input
+            type="number"
+            id="AC"
+            [(ngModel)]="creature.AC"
+            name="AC"
+            placeholder="15"
+            min="0"
+            max="30"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="initiative">Initiative Bonus *</label>
+          <input
+            type="number"
+            id="initiative"
+            [(ngModel)]="creature.initiative"
+            name="initiative"
+            placeholder="3"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="Speed">Speed (ft) *</label>
+          <input
+            type="number"
+            id="Speed"
+            [(ngModel)]="creature.Speed"
+            name="Speed"
+            placeholder="30"
+            required
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat Block Section -->
+    <div class="form-section">
+      <h2 class="section-title">📊 Stat Block *</h2>
+      
+      <div class="abilities-grid">
+        <div class="ability-group">
+          <label for="Str">Strength</label>
+          <input
+            type="number"
+            id="Str"
+            [(ngModel)]="creature.statBlock.Str"
+            name="Str"
+            min="-5"
+            max="5"
+            placeholder="0"
+            required
+          />
+        </div>
+
+        <div class="ability-group">
+          <label for="Dex">Dexterity</label>
+          <input
+            type="number"
+            id="Dex"
+            [(ngModel)]="creature.statBlock.Dex"
+            name="Dex"
+            min="-5"
+            max="5"
+            placeholder="0"
+            required
+          />
+        </div>
+
+        <div class="ability-group">
+          <label for="Con">Constitution</label>
+          <input
+            type="number"
+            id="Con"
+            [(ngModel)]="creature.statBlock.Con"
+            name="Con"
+            min="-5"
+            max="5"
+            placeholder="0"
+            required
+          />
+        </div>
+
+        <div class="ability-group">
+          <label for="Int">Intelligence</label>
+          <input
+            type="number"
+            id="Int"
+            [(ngModel)]="creature.statBlock.Int"
+            name="Int"
+            min="-5"
+            max="5"
+            placeholder="0"
+            required
+          />
+        </div>
+
+        <div class="ability-group">
+          <label for="Wis">Wisdom</label>
+          <input
+            type="number"
+            id="Wis"
+            [(ngModel)]="creature.statBlock.Wis"
+            name="Wis"
+            min="-5"
+            max="5"
+            placeholder="0"
+            required
+          />
+        </div>
+
+        <div class="ability-group">
+          <label for="Cha">Charisma</label>
+          <input
+            type="number"
+            id="Cha"
+            [(ngModel)]="creature.statBlock.Cha"
+            name="Cha"
+            min="-5"
+            max="5"
+            placeholder="0"
+            required
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Defenses Section -->
+    <div class="form-section">
+      <h2 class="section-title">🛡️ Defenses</h2>
+      
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="resistances">Resistances</label>
+          <input
+            type="text"
+            id="resistances"
+            [(ngModel)]="resistancesInput"
+            name="resistances"
+            placeholder="e.g., fire, cold, poison (comma separated)"
+          />
+          <small class="field-hint">Enter damage types separated by commas</small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="immunities">Immunities</label>
+          <input
+            type="text"
+            id="immunities"
+            [(ngModel)]="immunitiesInput"
+            name="immunities"
+            placeholder="e.g., poison, psychic (comma separated)"
+          />
+          <small class="field-hint">Enter damage types separated by commas</small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="weaknesses">Weaknesses</label>
+          <input
+            type="text"
+            id="weaknesses"
+            [(ngModel)]="weaknessesInput"
+            name="weaknesses"
+            placeholder="e.g., fire, radiant (comma separated)"
+          />
+          <small class="field-hint">Enter damage types separated by commas</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attacks Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <h2 class="section-title">⚔️ Attacks</h2>
+        <button type="button" class="btn btn-add" (click)="addAttack()">
+          + Add Attack
+        </button>
+      </div>
+
+      <div *ngIf="creature.attack && creature.attack.length === 0" class="no-attacks">
+        <p>No attacks added yet. Click "Add Attack" to create one.</p>
+      </div>
+
+      <div *ngFor="let attack of creature.attack; let i = index" class="attack-form">
+        <div class="attack-header">
+          <h3 class="attack-number">Attack {{ i + 1 }}</h3>
+          <button type="button" class="btn btn-remove" (click)="removeAttack(i)">
+            Remove
+          </button>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label [attr.for]="'attack-name-' + i">Attack Name *</label>
+            <input
+              type="text"
+              [id]="'attack-name-' + i"
+              [(ngModel)]="attack.name"
+              [name]="'attack-name-' + i"
+              placeholder="e.g., Bite, Claw, Fire Breath"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label [attr.for]="'attack-bonus-' + i">Attack Bonus</label>
+            <input
+              type="number"
+              [id]="'attack-bonus-' + i"
+              [(ngModel)]="attack.attackBonus"
+              [name]="'attack-bonus-' + i"
+              placeholder="e.g., +7"
+            />
+          </div>
+
+          <div class="form-group">
+            <label [attr.for]="'attack-damage-' + i">Damage</label>
+            <input
+              type="text"
+              [id]="'attack-damage-' + i"
+              [(ngModel)]="attack.damage"
+              [name]="'attack-damage-' + i"
+              placeholder="e.g., 2d6 + 4"
+            />
+          </div>
+
+          <div class="form-group">
+            <label [attr.for]="'attack-damageType-' + i">Damage Type</label>
+            <input
+              type="text"
+              [id]="'attack-damageType-' + i"
+              [(ngModel)]="attack.damageType"
+              [name]="'attack-damageType-' + i"
+              placeholder="e.g., piercing, fire"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label [attr.for]="'attack-range-' + i">Range</label>
+            <input
+              type="text"
+              [id]="'attack-range-' + i"
+              [(ngModel)]="attack.range"
+              [name]="'attack-range-' + i"
+              placeholder="e.g., 5 ft., 30/120 ft."
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label [attr.for]="'attack-description-' + i">Description</label>
+            <textarea
+              [id]="'attack-description-' + i"
+              [(ngModel)]="attack.description"
+              [name]="'attack-description-' + i"
+              rows="2"
+              placeholder="Special effects or additional damage..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="loading">
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="loading">
+        <span *ngIf="!loading">✨ Create Creature</span>
+        <span *ngIf="loading">Creating...</span>
+      </button>
+    </div>
+  </form>
+</div>

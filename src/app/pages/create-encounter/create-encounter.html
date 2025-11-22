@@ -1,0 +1,183 @@
+<div class="container">
+  <div class="form-header">
+    <h1 class="page-title">⚔️ Create New Encounter</h1>
+    <p class="subtitle">Design an epic battle for your party!</p>
+  </div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+
+  <form class="encounter-form" (ngSubmit)="createEncounter()">
+    <!-- Basic Information Section -->
+    <div class="form-section">
+      <h2 class="section-title">📋 Encounter Details</h2>
+      
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="name">Encounter Name *</label>
+          <input
+            type="text"
+            id="name"
+            [(ngModel)]="encounter.name"
+            name="name"
+            placeholder="e.g., Dragon's Lair Ambush"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="description">Description *</label>
+          <textarea
+            id="description"
+            [(ngModel)]="encounter.description"
+            name="description"
+            rows="4"
+            placeholder="Describe the encounter scenario, location, and any special conditions..."
+            required
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="partyLevel">Party Level</label>
+          <input
+            type="number"
+            id="partyLevel"
+            [(ngModel)]="encounter.partyLevel"
+            name="partyLevel"
+            min="1"
+            max="20"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="difficulty">Difficulty Level *</label>
+          <select id="difficulty" [(ngModel)]="encounter.difficultyLevel" name="difficulty" required>
+            <option [ngValue]="undefined">Select Difficulty</option>
+            <option *ngFor="let diff of difficulties" [value]="diff">
+              {{ formatDifficulty(diff) }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="Region">Region</label>
+          <select id="Region" [(ngModel)]="encounter.Region" name="Region">
+            <option [ngValue]="undefined">Select Region</option>
+            <option *ngFor="let region of regions" [value]="region">
+              {{ formatRegion(region) }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="isPrivate"
+              name="isPrivate"
+            />
+            <span>Create as private encounter (only visible to me)</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Creatures Selection Section -->
+    <div class="form-section">
+      <h2 class="section-title">🐉 Select Creatures ({{ selectedCreatureIds.length }} selected) *</h2>
+      
+      <div *ngIf="loadingCreatures" class="loading-creatures">
+        Loading available creatures...
+      </div>
+
+      <div *ngIf="!loadingCreatures && availableCreatures.length === 0" class="no-creatures">
+        <p>No creatures available. Create some creatures first!</p>
+        <a routerLink="/create-creature" class="btn btn-secondary">Create Creature</a>
+      </div>
+
+      <div *ngIf="!loadingCreatures && availableCreatures.length > 0">
+        <!-- Search and Filter Bar -->
+        <div class="creature-filters">
+          <div class="search-box">
+            <input 
+              type="text" 
+              [(ngModel)]="creatureSearchTerm" 
+              [ngModelOptions]="{standalone: true}"
+              placeholder="🔍 Search creatures by name..." 
+              class="search-input"
+            />
+          </div>
+          <div class="filter-row-inline">
+            <select [(ngModel)]="creatureFilterCR" [ngModelOptions]="{standalone: true}" class="filter-select">
+              <option value="">All CRs</option>
+              <option value="0">CR 0</option>
+              <option value="1/8">CR 1/8</option>
+              <option value="1/4">CR 1/4</option>
+              <option value="1/2">CR 1/2</option>
+              <option value="1">CR 1-5</option>
+              <option value="6">CR 6-10</option>
+              <option value="11">CR 11-15</option>
+              <option value="16">CR 16-20</option>
+              <option value="21">CR 21+</option>
+            </select>
+            <select [(ngModel)]="creatureFilterRegion" [ngModelOptions]="{standalone: true}" class="filter-select">
+              <option value="">All Regions</option>
+              <option *ngFor="let region of regions" [value]="region">{{ formatRegion(region) }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="creatures-grid">
+          <div
+            *ngFor="let creature of getFilteredCreatures()"
+            class="creature-select-card"
+            [class.selected]="isCreatureSelected(creature.Id!)"
+            (click)="toggleCreature(creature.Id!)"
+          >
+            <div class="creature-checkbox">
+              <input
+                type="checkbox"
+                [checked]="isCreatureSelected(creature.Id!)"
+                (click)="$event.stopPropagation()"
+              />
+            </div>
+            
+            <div class="creature-info">
+              <h4 class="creature-name">{{ creature.name }}</h4>
+              <div class="creature-meta">
+                <span *ngIf="creature.cr" class="meta-item cr-badge">CR {{ creature.cr }}</span>
+                <span *ngIf="creature.HP" class="meta-item hp-badge">{{ creature.HP }} HP</span>
+                <span *ngIf="creature.AC" class="meta-item ac-badge">AC {{ creature.AC }}</span>
+              </div>
+              <div class="creature-meta-secondary">
+                <span *ngIf="creature.Region" class="meta-item-small">📍 {{ formatRegion(creature.Region) }}</span>
+                <span *ngIf="creature.Rarity" class="meta-item-small">✨ {{ formatRarity(creature.Rarity) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="creatures-count">
+          Showing {{ getFilteredCreatures().length }} of {{ availableCreatures.length }} creatures
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="loading">
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="loading || selectedCreatureIds.length === 0">
+        <span *ngIf="!loading">⚔️ Create Encounter</span>
+        <span *ngIf="loading">Creating...</span>
+      </button>
+    </div>
+  </form>
+</div>

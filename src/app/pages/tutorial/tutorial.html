@@ -1,0 +1,273 @@
+<div class="tutorial-container">
+  <!-- Welcome Screen -->
+  <div *ngIf="showWelcome()" class="welcome-screen">
+    <div class="welcome-content">
+      <div class="welcome-icon">⚔️</div>
+      <h1 class="welcome-title">Welcome, Adventurer!</h1>
+      <p class="welcome-subtitle">Learn to master the Encounter Your Doom system</p>
+      
+      <div class="features-preview">
+        <div class="feature-card">
+          <div class="feature-icon">🐉</div>
+          <h3>Creature Library</h3>
+          <p>Browse & create monsters</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚔️</div>
+          <h3>Encounters</h3>
+          <p>Build epic battles</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Combat Tracker</h3>
+          <p>Manage live combat</p>
+        </div>
+      </div>
+
+      <div class="welcome-actions">
+        <button class="btn btn-primary btn-large" (click)="startTutorial()">
+          🎓 Start Interactive Tutorial
+        </button>
+        <button class="btn btn-secondary" (click)="skipTutorial()">
+          Skip to Home
+        </button>
+      </div>
+
+      <div class="demo-data-info">
+        <h3>📦 Demo Data Available</h3>
+        <div class="data-stats">
+          <div class="stat">
+            <span class="stat-value">{{ demoCreatures().length }}</span>
+            <span class="stat-label">Demo Creatures</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ demoEncounters().length }}</span>
+            <span class="stat-label">Demo Encounters</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tutorial Steps -->
+  <div *ngIf="!showWelcome() && tutorialActive()" class="tutorial-active">
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progress"></div>
+      </div>
+      <div class="progress-text">
+        Step {{ currentStep() + 1 }} of {{ steps.length }} 
+        ({{ completedSteps }} completed)
+      </div>
+    </div>
+
+    <!-- Current Step Content -->
+    <div class="step-card">
+      <div class="step-icon-large">{{ currentStepData.icon }}</div>
+      
+      <h2 class="step-title">{{ currentStepData.title }}</h2>
+      <p class="step-description">{{ currentStepData.description }}</p>
+
+      <!-- Step Indicator Dots -->
+      <div class="step-indicators">
+        <div 
+          *ngFor="let step of steps; let i = index"
+          class="step-dot"
+          [class.active]="i === currentStep()"
+          [class.completed]="step.completed"
+          (click)="goToStep(i)">
+          <span *ngIf="step.completed">✓</span>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="step-actions">
+        <button 
+          class="btn btn-secondary" 
+          (click)="previousStep()"
+          [disabled]="currentStep() === 0">
+          ← Previous
+        </button>
+
+        <button 
+          *ngIf="currentStepData.action"
+          class="btn btn-primary btn-large"
+          (click)="performAction()">
+          {{ currentStepData.action }}
+        </button>
+
+        <button 
+          *ngIf="!currentStepData.action && currentStep() < steps.length - 1"
+          class="btn btn-primary"
+          (click)="nextStep()">
+          Next →
+        </button>
+
+        <button 
+          *ngIf="currentStep() === steps.length - 1 && !isTutorialCompleted"
+          class="btn btn-success btn-large"
+          (click)="finishTutorial()">
+          🏆 Complete Tutorial
+        </button>
+
+        <button 
+          *ngIf="isTutorialCompleted"
+          class="btn btn-primary btn-large"
+          (click)="skipTutorial()">
+          🚀 Start Using App
+        </button>
+      </div>
+
+      <div class="tutorial-controls">
+        <button class="btn-text" (click)="skipTutorial()">Skip Tutorial</button>
+        <button class="btn-text" (click)="restartTutorial()">Restart</button>
+      </div>
+    </div>
+
+    <!-- Interactive Demo Content -->
+    <div class="demo-interactive">
+      <div class="demo-header">
+        <span class="demo-badge">📚 INTERACTIVE DEMO</span>
+      </div>
+
+      <!-- Demo Creatures (Step 1) -->
+      <div *ngIf="showDemoCreatures" class="demo-creatures-grid">
+        <h3 class="demo-title">Try Clicking on Demo Creatures Below!</h3>
+        <div class="creatures-grid">
+          <div *ngFor="let creature of demoCreatures()" 
+               class="creature-card-demo" 
+               (click)="selectDemoItem(creature)">
+            <h4 class="creature-name-demo">{{ creature.name }}</h4>
+            <div class="creature-badges-demo">
+              <span class="badge-demo badge-cr">CR {{ creature.cr }}</span>
+              <span *ngIf="creature.rarity" class="badge-demo badge-rarity">{{ creature.rarity }}</span>
+            </div>
+            <p class="creature-desc-demo">{{ creature.description }}</p>
+            <div class="creature-stats-demo">
+              <span>HP: {{ creature.HP || '—' }}</span>
+              <span>AC: {{ creature.AC || '—' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Demo Encounters (Step 3) -->
+      <div *ngIf="showDemoEncounters" class="demo-encounters-grid">
+        <h3 class="demo-title">Explore Demo Encounters Below!</h3>
+        <div class="encounters-grid">
+          <div *ngFor="let encounter of demoEncounters()" 
+               class="encounter-card-demo" 
+               (click)="selectDemoItem(encounter)">
+            <h4 class="encounter-name-demo">{{ encounter.name }}</h4>
+            <div class="encounter-badges-demo">
+              <span class="badge-demo badge-difficulty">{{ encounter.difficultyLevel }}</span>
+              <span class="badge-demo badge-party">Party Lv{{ encounter.partyLevel }}</span>
+            </div>
+            <p class="encounter-desc-demo">{{ encounter.description }}</p>
+            <div class="encounter-creatures-demo">
+              {{ encounter.creatures?.length || 0 }} creature(s)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Message for non-interactive steps -->
+      <div *ngIf="!showDemoCreatures && !showDemoEncounters" class="demo-info-box">
+        <div class="info-icon">ℹ️</div>
+        <p>This step provides information about the feature. 
+           Interactive demos are available on creature and encounter steps!</p>
+        <div class="demo-data-summary">
+          <div class="summary-item">
+            <strong>{{ demoCreatures().length }}</strong> Demo Creatures
+          </div>
+          <div class="summary-item">
+            <strong>{{ demoEncounters().length }}</strong> Demo Encounters
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for Demo Items -->
+    <div *ngIf="selectedDemoItem()" class="modal-overlay" (click)="closeDemoModal()">
+      <div class="modal-content-demo" (click)="$event.stopPropagation()">
+        <button class="modal-close-demo" (click)="closeDemoModal()">×</button>
+        
+        <!-- Creature Details -->
+        <div *ngIf="asCreature">
+          <h2 class="modal-title-demo">{{ asCreature.name }}</h2>
+          <div class="modal-badges-demo">
+            <span class="badge-demo badge-cr">CR {{ asCreature.cr }}</span>
+            <span *ngIf="asCreature.region" class="badge-demo">{{ asCreature.region }}</span>
+            <span *ngIf="asCreature.rarity" class="badge-demo">{{ asCreature.rarity }}</span>
+          </div>
+          <p class="modal-desc-demo">{{ asCreature.description }}</p>
+          
+          <div class="modal-stats-grid-demo">
+            <div class="stat-box-demo">
+              <div>HP</div>
+              <div class="stat-value-demo">{{ asCreature.HP || '—' }}</div>
+            </div>
+            <div class="stat-box-demo">
+              <div>AC</div>
+              <div class="stat-value-demo">{{ asCreature.AC || '—' }}</div>
+            </div>
+            <div class="stat-box-demo">
+              <div>Speed</div>
+              <div class="stat-value-demo">{{ asCreature.speed || '—' }}</div>
+            </div>
+          </div>
+          
+          <div *ngIf="asCreature.abilities" class="abilities-grid-demo">
+            <h4>Ability Scores</h4>
+            <div class="abilities-row-demo">
+              <div class="ability-demo">
+                <div>STR</div>
+                <div class="ability-val-demo">{{ asCreature.abilities.strength }}</div>
+              </div>
+              <div class="ability-demo">
+                <div>DEX</div>
+                <div class="ability-val-demo">{{ asCreature.abilities.dexterity }}</div>
+              </div>
+              <div class="ability-demo">
+                <div>CON</div>
+                <div class="ability-val-demo">{{ asCreature.abilities.constitution }}</div>
+              </div>
+              <div class="ability-demo">
+                <div>INT</div>
+                <div class="ability-val-demo">{{ asCreature.abilities.intelligence }}</div>
+              </div>
+              <div class="ability-demo">
+                <div>WIS</div>
+                <div class="ability-val-demo">{{ asCreature.abilities.wisdom }}</div>
+              </div>
+              <div class="ability-demo">
+                <div>CHA</div>
+                <div class="ability-val-demo">{{ asCreature.abilities.charisma }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Encounter Details -->
+        <div *ngIf="asEncounter">
+          <h2 class="modal-title-demo">{{ asEncounter.name }}</h2>
+          <div class="modal-badges-demo">
+            <span class="badge-demo badge-difficulty">{{ asEncounter.difficultyLevel }}</span>
+            <span class="badge-demo">Party Level {{ asEncounter.partyLevel }}</span>
+            <span *ngIf="asEncounter.region" class="badge-demo">{{ asEncounter.region }}</span>
+          </div>
+          <p class="modal-desc-demo">{{ asEncounter.description }}</p>
+          
+          <div class="creatures-list-demo">
+            <h4>Creatures in this Encounter:</h4>
+            <div *ngFor="let creature of asEncounter.creatures" class="creature-item-demo">
+              <strong>{{ creature.name }}</strong>
+              <span class="badge-demo badge-cr">CR {{ creature.cr }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
