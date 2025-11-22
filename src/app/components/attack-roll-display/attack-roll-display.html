@@ -1,0 +1,64 @@
+<div *ngIf="isOpen" class="attack-roll-overlay" (click)="close()">
+  <div class="attack-roll-container" (click)="$event.stopPropagation()" *ngIf="result">
+    <div class="attack-header">
+      <h2>{{ result.creatureName }}</h2>
+      <h3>{{ result.attackName }}</h3>
+      <button class="close-btn" (click)="close()">✕</button>
+    </div>
+
+    <!-- Attack Roll Section -->
+    <div class="roll-section attack-section" [class.critical]="result.isCritical" [class.fail]="result.isFail">
+      <h4>⚔️ Attack Roll</h4>
+      <div class="dice-display" [class.animating]="isAnimating()">
+        <div class="d20-result" [class.spinning]="isAnimating()">
+          {{ result.attackRoll }}
+        </div>
+      </div>
+      <div class="roll-calculation">
+        <span class="roll-value">{{ result.attackRoll }}</span>
+        <span class="operator">+</span>
+        <span class="bonus-value">{{ result.attackBonus }}</span>
+        <span class="operator">=</span>
+        <span class="total-value">{{ result.attackTotal }}</span>
+      </div>
+      <div *ngIf="result.isCritical" class="crit-label critical-hit">
+        🎯 CRITICAL HIT!
+      </div>
+      <div *ngIf="result.isFail" class="crit-label critical-miss">
+        ❌ CRITICAL MISS!
+      </div>
+    </div>
+
+    <!-- Damage Roll Section -->
+    <div *ngIf="result.damageRolls && result.damageRolls.length > 0" class="roll-section damage-section">
+      <h4>💥 Damage</h4>
+      <div class="dice-grid">
+        <div *ngFor="let roll of result.damageRolls; let i = index" 
+             class="damage-die" 
+             [class.animating]="isAnimating()"
+             [style.animation-delay.ms]="i * 100">
+          {{ roll }}
+        </div>
+        <div *ngIf="result.damageModifier && result.damageModifier !== 0" 
+             class="damage-modifier">
+          {{ result.damageModifier > 0 ? '+' : '' }}{{ result.damageModifier }}
+        </div>
+      </div>
+      <div class="damage-calculation">
+        <span class="dice-values">[{{ result.damageRolls.join(', ') }}]</span>
+        <span *ngIf="result.damageModifier && result.damageModifier !== 0" class="modifier-display">
+          {{ result.damageModifier > 0 ? '+' : '' }}{{ result.damageModifier }}
+        </span>
+        <span class="operator">=</span>
+        <span class="damage-total">{{ result.damageTotal }}</span>
+      </div>
+      <div *ngIf="result.isCritical" class="crit-note">
+        ✨ Damage dice doubled for critical hit!
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn-close-display" (click)="close()">Close</button>
+    </div>
+  </div>
+</div>

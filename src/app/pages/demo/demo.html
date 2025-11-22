@@ -1,0 +1,180 @@
+<div class="combat-container">
+  <div class="combat-header">
+    <div class="header-content">
+      <h1 class="combat-title">⚔️ Active Combat (Demo)</h1>
+      <div class="combat-info">
+        <span class="round-counter">Round {{ round() }}</span>
+        <button class="btn btn-initiative" (click)="rollInitiative()">🎲 Roll Initiative</button>
+        <button class="btn btn-danger">End Combat</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="combat-layout">
+    <!-- Initiative Tracker (Left Column) -->
+    <div class="initiative-panel">
+      <h2 class="panel-title">📜 Initiative Order</h2>
+      
+      <div class="initiative-list">
+        <div 
+          *ngFor="let creature of sortedCreatures(); let i = index"
+          class="initiative-item"
+          [class.current-turn]="isCurrentTurn(creature.id)"
+          [class.selected]="selectedCreatureId() === creature.id"
+          (click)="selectCreature(creature.id)">
+          
+          <div class="turn-indicator" *ngIf="isCurrentTurn(creature.id)">
+            <span class="indicator-arrow">▶</span>
+          </div>
+
+          <div class="creature-initiative-card">
+            <div class="initiative-badge">{{ creature.initiative }}</div>
+            
+            <div class="creature-info">
+              <h3 class="creature-name">{{ creature.name }}</h3>
+              
+              <div class="hp-display">
+                <div class="hp-bar-container">
+                  <div 
+                    class="hp-bar" 
+                    [style.width.%]="getHpPercentage(creature)"
+                    [style.backgroundColor]="getHpColor(getHpPercentage(creature))">
+                  </div>
+                </div>
+                <span class="hp-text">{{ creature.currentHp }}/{{ creature.maxHp }} HP</span>
+              </div>
+
+              <div class="creature-stats">
+                <span class="stat-badge">AC {{ creature.armorClass }}</span>
+                <span *ngFor="let effect of creature.statusEffects" 
+                      class="status-badge"
+                      (click)="removeStatusEffect(creature.id, effect); $event.stopPropagation()">
+                  {{ effect }} ✕
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="turn-controls">
+        <button class="btn btn-primary btn-large" (click)="nextTurn()">
+          Next Turn ▶
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Combat Area (Center) -->
+    <div class="combat-main">
+      <div *ngIf="selectedCreatureId()" class="creature-detail">
+        <ng-container *ngFor="let creature of mockCreatures()">
+          <div *ngIf="creature.id === selectedCreatureId()" class="detail-content">
+            <div class="detail-header">
+              <h2 class="detail-title">{{ creature.name }}</h2>
+              <div class="detail-badges">
+                <span class="badge-ac">🛡️ AC {{ creature.armorClass }}</span>
+                <span class="badge-init">⚡ Init {{ creature.initiative }}</span>
+              </div>
+            </div>
+
+            <div class="hp-section">
+              <h3 class="section-title">❤️ Hit Points</h3>
+              <div class="hp-large-display">
+                <div class="hp-value">{{ creature.currentHp }} / {{ creature.maxHp }}</div>
+                <div class="hp-bar-large">
+                  <div 
+                    class="hp-fill" 
+                    [style.width.%]="getHpPercentage(creature)"
+                    [style.backgroundColor]="getHpColor(getHpPercentage(creature))">
+                  </div>
+                </div>
+              </div>
+
+              <div class="hp-controls">
+                <div class="hp-control-group">
+                  <label>Damage</label>
+                  <div class="control-input-group">
+                    <input 
+                      type="number" 
+                      [(ngModel)]="damageAmount" 
+                      min="0" 
+                      placeholder="0"
+                      class="hp-input">
+                    <button class="btn btn-damage" (click)="applyDamage(creature.id)">
+                      💥 Apply
+                    </button>
+                  </div>
+                </div>
+
+                <div class="hp-control-group">
+                  <label>Healing</label>
+                  <div class="control-input-group">
+                    <input 
+                      type="number" 
+                      [(ngModel)]="healAmount" 
+                      min="0" 
+                      placeholder="0"
+                      class="hp-input">
+                    <button class="btn btn-heal" (click)="applyHealing(creature.id)">
+                      ✨ Heal
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="creature.attacks && creature.attacks.length > 0" class="attacks-section">
+              <h3 class="section-title">⚔️ Attacks</h3>
+              <div class="attacks-list">
+                <div *ngFor="let attack of creature.attacks" class="attack-item">
+                  <div class="attack-header">
+                    <span class="attack-name">{{ attack.name }}</span>
+                    <span *ngIf="attack.attackBonus" class="attack-bonus">+{{ attack.attackBonus }}</span>
+                  </div>
+                  <div class="attack-details">
+                    <span *ngIf="attack.damage" class="attack-damage">💥 {{ attack.damage }}</span>
+                    <span *ngIf="attack.range" class="attack-range">🎯 {{ attack.range }}</span>
+                  </div>
+                  <div *ngIf="attack.description" class="attack-description">{{ attack.description }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="status-section">
+              <h3 class="section-title">🌟 Status Effects</h3>
+              
+              <div class="status-list">
+                <div *ngFor="let effect of creature.statusEffects" class="status-item">
+                  <span>{{ effect }}</span>
+                  <button class="remove-status" (click)="removeStatusEffect(creature.id, effect)">
+                    ✕
+                  </button>
+                </div>
+                <div *ngIf="creature.statusEffects.length === 0" class="no-status">
+                  No status effects
+                </div>
+              </div>
+
+              <div class="add-status">
+                <input 
+                  type="text" 
+                  [(ngModel)]="newStatusEffect" 
+                  placeholder="e.g., Poisoned, Stunned, Blessed"
+                  class="status-input"
+                  (keyup.enter)="addStatusEffect(creature.id)">
+                <button class="btn btn-add-status" (click)="addStatusEffect(creature.id)">
+                  + Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Dice Roller (Right Column) -->
+    <div class="tools-panel">
+      <app-dice-roller />
+    </div>
+  </div>
+</div>

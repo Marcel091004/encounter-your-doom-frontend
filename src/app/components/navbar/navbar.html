@@ -1,0 +1,42 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <a routerLink="/" class="nav-logo">
+      <span class="logo-icon">⚔️</span>
+      <span class="logo-text">Encounter Your Doom</span>
+    </a>
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+          <span class="nav-icon">🏠</span>
+          Home
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/tutorial" routerLinkActive="active" 
+           [class.nav-tutorial]="highlightTutorial()" 
+           class="nav-link">
+          <span class="nav-icon">🎓</span>
+          Tutorial
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/creatures" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">🐉</span>
+          Creatures
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/encounters" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">⚔️</span>
+          Encounters
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/my-encounters" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📜</span>
+          My Encounters
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>

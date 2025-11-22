@@ -1,0 +1,64 @@
+<div class="home-container">
+  <!-- Tutorial Banner -->
+  <div *ngIf="showTutorialBanner()" class="tutorial-banner">
+    <button class="banner-dismiss" (click)="dismissTutorialBanner()" title="Dismiss">×</button>
+    <div class="banner-content">
+      <div class="banner-icon">🎓</div>
+      <div class="banner-text">
+        <h3>New to Encounter Your Doom?</h3>
+        <p>Take our interactive tutorial to learn all features!</p>
+      </div>
+      <a routerLink="/tutorial" class="btn btn-tutorial" (click)="dismissTutorialBanner()">Start Tutorial</a>
+    </div>
+  </div>
+
+  <div class="hero">
+    <h1 class="hero-title">⚔️ Encounter Your Doom ⚔️</h1>
+    <p class="hero-subtitle">Epic D&D Encounter Management System</p>
+    <div class="hero-description">
+      <p>Welcome, adventurer! Prepare for legendary battles and unforgettable encounters.</p>
+      <p>Manage creatures, create epic encounters, and embark on thrilling adventures!</p>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon">🐉</div>
+      <h2>Discover Creatures</h2>
+      <p>Browse through a vast collection of mythical creatures, monsters, and beasts.</p>
+      <a routerLink="/creatures" class="btn btn-primary">View Creatures</a>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">⚔️</div>
+      <h2>Explore Encounters</h2>
+      <p>Find pre-made encounters or create your own epic battles for your party.</p>
+      <a routerLink="/encounters" class="btn btn-primary">View Encounters</a>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">📜</div>
+      <h2>My Adventures</h2>
+      <p>Access your personal collection of encounters and prepare for battle.</p>
+      <a routerLink="/my-encounters" class="btn btn-primary">My Encounters</a>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <div class="info-card">
+      <h3>🎲 How It Works</h3>
+      <ol>
+        <li>Browse creatures and encounters from our extensive library</li>
+        <li>Filter by region, rarity, difficulty, and party level</li>
+        <li>Copy public encounters to your private collection</li>
+        <li>Start encounters and manage your epic battles</li>
+      </ol>
+    </div>
+    
+    <div class="info-card demo-info">
+      <h3>📦 Demo Mode Available</h3>
+      <p>Can't connect to the backend? No problem! We have demo data with 8 pre-loaded creatures and encounters for you to explore.</p>
+      <a routerLink="/demo" class="btn btn-secondary">Try Combat Demo</a>
+    </div>
+  </div>
+</div>

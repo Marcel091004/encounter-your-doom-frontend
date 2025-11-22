@@ -1,0 +1,367 @@
+.dice-roller-container {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.dice-title {
+  text-align: center;
+  color: #ff6b9d;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.dice-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+  perspective: 1000px;
+}
+
+.dice-wrapper {
+  margin-bottom: 1rem;
+}
+
+.dice-face {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5),
+              inset 0 -5px 15px rgba(0, 0, 0, 0.3),
+              inset 0 5px 15px rgba(255, 255, 255, 0.2);
+  transform-style: preserve-3d;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: relative;
+}
+
+.dice-face::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent);
+  border-radius: 20px;
+  z-index: -1;
+}
+
+.dice-wrapper.rolling .dice-face {
+  animation: diceRoll 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes diceRoll {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+  }
+  25% {
+    transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg) scale(1.2);
+  }
+  50% {
+    transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg) scale(0.9);
+  }
+  75% {
+    transform: rotateX(1080deg) rotateY(540deg) rotateZ(270deg) scale(1.1);
+  }
+  100% {
+    transform: rotateX(1440deg) rotateY(720deg) rotateZ(360deg) scale(1);
+  }
+}
+
+.dice-result {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  transform: translateZ(20px);
+}
+
+.dice-face.critical {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  animation: criticalPulse 0.6s ease-in-out 3;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.8),
+              0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.dice-face.critical-fail {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  animation: failShake 0.5s ease-in-out 2;
+}
+
+@keyframes criticalPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 50px rgba(255, 215, 0, 1);
+  }
+}
+
+@keyframes failShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px) rotate(-5deg);
+  }
+  75% {
+    transform: translateX(10px) rotate(5deg);
+  }
+}
+
+.dice-label {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ff6b9d;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.dice-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.dice-btn {
+  padding: 0.75rem;
+  border: 2px solid;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #f5f5f5;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.dice-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.dice-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.dice-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dice-btn.active {
+  background: rgba(233, 69, 96, 0.2);
+  transform: scale(0.95);
+}
+
+.dice-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.roll-history {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  color: #ff6b9d;
+  font-weight: 600;
+}
+
+.clear-btn {
+  padding: 0.25rem 0.75rem;
+  background: rgba(233, 69, 96, 0.2);
+  border: 1px solid #e94560;
+  border-radius: 6px;
+  color: #ff6b9d;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.clear-btn:hover {
+  background: rgba(233, 69, 96, 0.3);
+  transform: scale(1.05);
+}
+
+.history-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.history-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.history-item.critical {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: #FFD700;
+}
+
+.history-item.critical-fail {
+  background: rgba(220, 38, 38, 0.2);
+  border-color: #dc2626;
+}
+
+.history-dice {
+  font-size: 0.875rem;
+  color: #ff6b9d;
+  font-weight: 600;
+}
+
+.history-result {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #f5f5f5;
+}
+
+/* Multi-dice display */
+.dice-config {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+
+.config-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.config-group label {
+  color: #f5f5f5;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.config-input {
+  width: 60px;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
+}
+
+.config-input:focus {
+  outline: none;
+  border-color: #ff6b9d;
+  box-shadow: 0 0 0 2px rgba(255, 107, 157, 0.2);
+}
+
+.multi-dice-display {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.mini-dice {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: bounce 0.5s ease-in-out;
+}
+
+.mini-dice.rolling {
+  animation: spin 0.5s linear infinite;
+}
+
+.modifier-display {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+}
+
+.history-detail {
+  font-size: 0.75rem;
+  color: #bdbdbd;
+  margin: 0 0.25rem;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .dice-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dice-face {
+    width: 100px;
+    height: 100px;
+  }
+
+  .dice-result {
+    font-size: 3rem;
+  }
+
+  .config-input {
+    width: 50px;
+  }
+}

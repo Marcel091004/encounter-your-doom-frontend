@@ -1,0 +1,275 @@
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">🐉 Creatures Library</h1>
+    <a routerLink="/create-creature" class="btn btn-create">✨ Create Creature</a>
+  </div>
+
+  <div class="filters">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="region">Region</label>
+        <select id="region" [(ngModel)]="selectedRegion" (change)="loadCreatures()">
+          <option value="">All Regions</option>
+          <option *ngFor="let region of regions" [value]="region">
+            {{ formatRegion(region) }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="rarity">Rarity</label>
+        <select id="rarity" [(ngModel)]="selectedRarity" (change)="loadCreatures()">
+          <option value="">All Rarities</option>
+          <option *ngFor="let rarity of rarities" [value]="rarity">
+            {{ formatRarity(rarity) }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="cr">Challenge Rating</label>
+        <input
+          type="text"
+          id="cr"
+          [(ngModel)]="selectedCr"
+          (change)="loadCreatures()"
+          placeholder="e.g., 1, 1/2, 5"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label>&nbsp;</label>
+        <button class="btn btn-secondary" (click)="clearFilters()">Clear Filters</button>
+      </div>
+
+      <div class="filter-group">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" (click)="getRandomCreature()">🎲 Random</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="loading" class="loading">Loading creatures...</div>
+
+  <div *ngIf="!loading && creatures.length === 0" class="no-results">
+    <p>No creatures found. Try adjusting your filters.</p>
+  </div>
+
+  <div *ngIf="!loading && creatures.length > 0" class="grid grid-3">
+    <div *ngFor="let creature of creatures" class="creature-card" (click)="openCreatureModal(creature)">
+      <div class="creature-header">
+        <h3 class="creature-name">{{ creature.name }}</h3>
+        <div *ngIf="creature.cr" class="creature-cr">CR {{ creature.cr }}</div>
+      </div>
+
+      <div class="creature-info">
+        <div *ngIf="creature.region" class="info-badge region">
+          <span class="badge-icon">🗺️</span>
+          {{ formatRegion(creature.region) }}
+        </div>
+        <div *ngIf="creature.rarity" class="info-badge rarity" [class]="'rarity-' + creature.rarity.toLowerCase()">
+          <span class="badge-icon">✨</span>
+          {{ formatRarity(creature.rarity) }}
+        </div>
+      </div>
+
+      <div *ngIf="creature.description" class="creature-description">
+        {{ creature.description }}
+      </div>
+
+      <div class="creature-stats" *ngIf="creature.HP || creature.AC || creature.speed">
+        <div *ngIf="creature.HP" class="stat">
+          <span class="stat-label">HP:</span>
+          <span class="stat-value">{{ creature.HP }}</span>
+        </div>
+        <div *ngIf="creature.AC" class="stat">
+          <span class="stat-label">AC:</span>
+          <span class="stat-value">{{ creature.AC }}</span>
+        </div>
+        <div *ngIf="creature.speed" class="stat">
+          <span class="stat-label">Speed:</span>
+          <span class="stat-value">{{ creature.speed }}</span>
+        </div>
+      </div>
+
+      <div class="creature-abilities" *ngIf="creature.abilities">
+        <div *ngIf="creature.abilities.strength" class="ability">
+          <span class="ability-label">STR</span>
+          <span class="ability-value">{{ creature.abilities.strength }}</span>
+        </div>
+        <div *ngIf="creature.abilities.dexterity" class="ability">
+          <span class="ability-label">DEX</span>
+          <span class="ability-value">{{ creature.abilities.dexterity }}</span>
+        </div>
+        <div *ngIf="creature.abilities.constitution" class="ability">
+          <span class="ability-label">CON</span>
+          <span class="ability-value">{{ creature.abilities.constitution }}</span>
+        </div>
+        <div *ngIf="creature.abilities.intelligence" class="ability">
+          <span class="ability-label">INT</span>
+          <span class="ability-value">{{ creature.abilities.intelligence }}</span>
+        </div>
+        <div *ngIf="creature.abilities.wisdom" class="ability">
+          <span class="ability-label">WIS</span>
+          <span class="ability-value">{{ creature.abilities.wisdom }}</span>
+        </div>
+        <div *ngIf="creature.abilities.charisma" class="ability">
+          <span class="ability-label">CHA</span>
+          <span class="ability-value">{{ creature.abilities.charisma }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Creature Modal -->
+  <app-modal [isOpen]="isModalOpen" [title]="selectedCreature?.name || ''" (closeModal)="closeModal()">
+    <div *ngIf="selectedCreature" class="modal-creature-details">
+      <div class="modal-header-info">
+        <div *ngIf="selectedCreature.cr" class="modal-cr">CR {{ selectedCreature.cr }}</div>
+        <div class="modal-badges">
+          <div *ngIf="selectedCreature.region" class="modal-badge region">
+            🗺️ {{ formatRegion(selectedCreature.region) }}
+          </div>
+          <div *ngIf="selectedCreature.rarity" class="modal-badge rarity" [class]="'rarity-' + selectedCreature.rarity.toLowerCase()">
+            ✨ {{ formatRarity(selectedCreature.rarity) }}
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="selectedCreature.description || selectedCreature.CreatureDescription" class="modal-description">
+        <h3>Description</h3>
+        <p>{{ selectedCreature.description || selectedCreature.CreatureDescription }}</p>
+      </div>
+
+      <div class="modal-stats" *ngIf="selectedCreature.HP || selectedCreature.AC || selectedCreature.speed || selectedCreature.Speed || selectedCreature.initiative">
+        <h3>Combat Stats</h3>
+        <div class="modal-stats-grid">
+          <div *ngIf="selectedCreature.HP" class="modal-stat">
+            <span class="stat-label">Hit Points:</span>
+            <span class="stat-value">{{ selectedCreature.HP }}</span>
+          </div>
+          <div *ngIf="selectedCreature.AC" class="modal-stat">
+            <span class="stat-label">Armor Class:</span>
+            <span class="stat-value">{{ selectedCreature.AC }}</span>
+          </div>
+          <div *ngIf="selectedCreature.speed || selectedCreature.Speed" class="modal-stat">
+            <span class="stat-label">Speed:</span>
+            <span class="stat-value">{{ selectedCreature.Speed || selectedCreature.speed }} ft</span>
+          </div>
+          <div *ngIf="selectedCreature.initiative !== undefined" class="modal-stat">
+            <span class="stat-label">Initiative Bonus:</span>
+            <span class="stat-value">{{ selectedCreature.initiative >= 0 ? '+' : '' }}{{ selectedCreature.initiative }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-abilities" *ngIf="selectedCreature.abilities || selectedCreature.statBlock">
+        <h3>Ability Scores</h3>
+        <div class="modal-abilities-grid">
+          <div *ngIf="selectedCreature.statBlock" class="modal-ability">
+            <span class="ability-label">STR</span>
+            <span class="ability-value">{{ selectedCreature.statBlock.Str >= 0 ? '+' : '' }}{{ selectedCreature.statBlock.Str }}</span>
+          </div>
+          <div *ngIf="selectedCreature.statBlock" class="modal-ability">
+            <span class="ability-label">DEX</span>
+            <span class="ability-value">{{ selectedCreature.statBlock.Dex >= 0 ? '+' : '' }}{{ selectedCreature.statBlock.Dex }}</span>
+          </div>
+          <div *ngIf="selectedCreature.statBlock" class="modal-ability">
+            <span class="ability-label">CON</span>
+            <span class="ability-value">{{ selectedCreature.statBlock.Con >= 0 ? '+' : '' }}{{ selectedCreature.statBlock.Con }}</span>
+          </div>
+          <div *ngIf="selectedCreature.statBlock" class="modal-ability">
+            <span class="ability-label">INT</span>
+            <span class="ability-value">{{ selectedCreature.statBlock.Int >= 0 ? '+' : '' }}{{ selectedCreature.statBlock.Int }}</span>
+          </div>
+          <div *ngIf="selectedCreature.statBlock" class="modal-ability">
+            <span class="ability-label">WIS</span>
+            <span class="ability-value">{{ selectedCreature.statBlock.Wis >= 0 ? '+' : '' }}{{ selectedCreature.statBlock.Wis }}</span>
+          </div>
+          <div *ngIf="selectedCreature.statBlock" class="modal-ability">
+            <span class="ability-label">CHA</span>
+            <span class="ability-value">{{ selectedCreature.statBlock.Cha >= 0 ? '+' : '' }}{{ selectedCreature.statBlock.Cha }}</span>
+          </div>
+          <!-- Legacy abilities support -->
+          <div *ngIf="!selectedCreature.statBlock && selectedCreature.abilities?.strength !== undefined" class="modal-ability">
+            <span class="ability-label">STR</span>
+            <span class="ability-value">{{ selectedCreature.abilities!.strength }}</span>
+          </div>
+          <div *ngIf="!selectedCreature.statBlock && selectedCreature.abilities?.dexterity !== undefined" class="modal-ability">
+            <span class="ability-label">DEX</span>
+            <span class="ability-value">{{ selectedCreature.abilities!.dexterity }}</span>
+          </div>
+          <div *ngIf="!selectedCreature.statBlock && selectedCreature.abilities?.constitution !== undefined" class="modal-ability">
+            <span class="ability-label">CON</span>
+            <span class="ability-value">{{ selectedCreature.abilities!.constitution }}</span>
+          </div>
+          <div *ngIf="!selectedCreature.statBlock && selectedCreature.abilities?.intelligence !== undefined" class="modal-ability">
+            <span class="ability-label">INT</span>
+            <span class="ability-value">{{ selectedCreature.abilities!.intelligence }}</span>
+          </div>
+          <div *ngIf="!selectedCreature.statBlock && selectedCreature.abilities?.wisdom !== undefined" class="modal-ability">
+            <span class="ability-label">WIS</span>
+            <span class="ability-value">{{ selectedCreature.abilities!.wisdom }}</span>
+          </div>
+          <div *ngIf="!selectedCreature.statBlock && selectedCreature.abilities?.charisma !== undefined" class="modal-ability">
+            <span class="ability-label">CHA</span>
+            <span class="ability-value">{{ selectedCreature.abilities!.charisma }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-attacks" *ngIf="(selectedCreature.attacks && selectedCreature.attacks.length > 0) || (selectedCreature.attack && selectedCreature.attack.length > 0)">
+        <h3>⚔️ Attacks</h3>
+        <div class="modal-attacks-list">
+          <div *ngFor="let attack of (selectedCreature.attack || selectedCreature.attacks)" class="modal-attack-item">
+            <div class="attack-header">
+              <span class="attack-name">{{ attack.name }}</span>
+              <span *ngIf="attack.attackBonus" class="attack-bonus">+{{ attack.attackBonus }} to hit</span>
+            </div>
+            <div class="attack-details">
+              <span *ngIf="attack.damage" class="attack-damage">
+                💥 {{ attack.damage }}
+                <span *ngIf="attack.damageType && attack.damageType.length > 0" class="damage-type">({{ formatDamageType(attack.damageType) }})</span>
+              </span>
+              <span *ngIf="attack.range" class="attack-range">🎯 Range: {{ attack.range }}</span>
+            </div>
+            <div *ngIf="attack.description" class="attack-description">{{ attack.description }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-defenses" *ngIf="(selectedCreature.resistances && selectedCreature.resistances.length > 0) || (selectedCreature.immunities && selectedCreature.immunities.length > 0) || (selectedCreature.weaknesses && selectedCreature.weaknesses.length > 0)">
+        <h3>🛡️ Defenses</h3>
+        <div class="defense-groups">
+          <div *ngIf="selectedCreature.resistances && selectedCreature.resistances.length > 0" class="defense-group">
+            <span class="defense-label">Resistances:</span>
+            <div class="defense-tags">
+              <span *ngFor="let resistance of selectedCreature.resistances" class="defense-tag resistance">{{ resistance }}</span>
+            </div>
+          </div>
+          <div *ngIf="selectedCreature.immunities && selectedCreature.immunities.length > 0" class="defense-group">
+            <span class="defense-label">Immunities:</span>
+            <div class="defense-tags">
+              <span *ngFor="let immunity of selectedCreature.immunities" class="defense-tag immunity">{{ immunity }}</span>
+            </div>
+          </div>
+          <div *ngIf="selectedCreature.weaknesses && selectedCreature.weaknesses.length > 0" class="defense-group">
+            <span class="defense-label">Weaknesses:</span>
+            <div class="defense-tags">
+              <span *ngFor="let weakness of selectedCreature.weaknesses" class="defense-tag weakness">{{ weakness }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-traits" *ngIf="selectedCreature.traits && selectedCreature.traits.length > 0">
+        <h3>✨ Special Traits</h3>
+        <div class="traits-list">
+          <div *ngFor="let trait of selectedCreature.traits" class="trait-item">{{ trait }}</div>
+        </div>
+      </div>
+    </div>
+  </app-modal>
+</div>

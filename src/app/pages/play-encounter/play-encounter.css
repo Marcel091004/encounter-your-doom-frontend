@@ -1,0 +1,428 @@
+.back-link {
+  margin-bottom: 2rem;
+}
+
+.encounter-play {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.encounter-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(233, 69, 96, 0.1), rgba(15, 52, 96, 0.1));
+  border-radius: 16px;
+  border: 2px solid rgba(233, 69, 96, 0.3);
+}
+
+.combat-action {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.btn-combat {
+  display: inline-block;
+  padding: 1.25rem 3rem;
+  background: linear-gradient(135deg, #e94560, #d63447);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(233, 69, 96, 0.4);
+  transition: all 0.3s ease;
+  animation: combatButtonPulse 2s ease-in-out infinite;
+}
+
+@keyframes combatButtonPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 24px rgba(233, 69, 96, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 32px rgba(233, 69, 96, 0.6);
+  }
+}
+
+.btn-combat:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 40px rgba(233, 69, 96, 0.6);
+  animation: none;
+}
+
+.encounter-title {
+  font-size: 3rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #e94560, #ff6b9d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1.5rem;
+}
+
+.encounter-meta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.meta-badge {
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.meta-badge.difficulty {
+  color: #fff;
+}
+
+.difficulty-easy {
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
+}
+
+.difficulty-medium {
+  background: linear-gradient(135deg, #ff9800, #ffa726);
+}
+
+.difficulty-hard {
+  background: linear-gradient(135deg, #f44336, #e57373);
+}
+
+.difficulty-deadly {
+  background: linear-gradient(135deg, #9c27b0, #ba68c8);
+}
+
+.meta-badge.party-level {
+  background: linear-gradient(135deg, #2196f3, #64b5f6);
+  color: #fff;
+}
+
+.meta-badge.region {
+  background: rgba(15, 52, 96, 0.5);
+  color: #81d4fa;
+  border: 1px solid rgba(129, 212, 250, 0.5);
+}
+
+.meta-badge.rarity {
+  border: 1px solid;
+}
+
+.rarity-common {
+  background: rgba(158, 158, 158, 0.3);
+  color: #bdbdbd;
+  border-color: rgba(189, 189, 189, 0.5);
+}
+
+.rarity-uncommon {
+  background: rgba(76, 175, 80, 0.3);
+  color: #81c784;
+  border-color: rgba(129, 199, 132, 0.5);
+}
+
+.rarity-rare {
+  background: rgba(33, 150, 243, 0.3);
+  color: #64b5f6;
+  border-color: rgba(100, 181, 246, 0.5);
+}
+
+.rarity-very_rare {
+  background: rgba(156, 39, 176, 0.3);
+  color: #ba68c8;
+  border-color: rgba(186, 104, 200, 0.5);
+}
+
+.rarity-legendary {
+  background: rgba(255, 152, 0, 0.3);
+  color: #ffb74d;
+  border-color: rgba(255, 183, 77, 0.5);
+}
+
+.encounter-description-section {
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.encounter-description-section h2 {
+  color: #ff6b9d;
+  margin-bottom: 1rem;
+  font-size: 1.75rem;
+}
+
+.description-text {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: #f5f5f5;
+}
+
+.creatures-section {
+  margin-bottom: 3rem;
+}
+
+.creatures-section h2 {
+  color: #ff6b9d;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.creatures-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.creature-detail-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.creature-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.creature-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ff6b9d;
+  margin: 0;
+}
+
+.creature-cr {
+  background: linear-gradient(135deg, #e94560, #d63447);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
+}
+
+.creature-badges {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.badge-small {
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.badge-small.region {
+  background: rgba(15, 52, 96, 0.3);
+  color: #81d4fa;
+  border: 1px solid rgba(129, 212, 250, 0.3);
+}
+
+.creature-description {
+  color: #f5f5f5;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.creature-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #ff6b9d;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  color: #f5f5f5;
+  font-weight: 700;
+}
+
+.abilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 1rem;
+}
+
+.ability-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ability-name {
+  font-size: 0.875rem;
+  color: #ff6b9d;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.ability-score {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f5f5f5;
+}
+
+.battle-ready {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, rgba(233, 69, 96, 0.1), rgba(15, 52, 96, 0.1));
+  border-radius: 16px;
+  border: 2px solid rgba(233, 69, 96, 0.3);
+}
+
+.battle-ready h2 {
+  font-size: 2rem;
+  color: #ff6b9d;
+  margin-bottom: 1rem;
+}
+
+.battle-ready p {
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: #f5f5f5;
+}
+
+/* Attacks Section */
+.attacks-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.attacks-title {
+  font-size: 1.125rem;
+  color: #ff6b9d;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.attacks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.attack-item {
+  background: rgba(15, 52, 96, 0.3);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.attack-item:hover {
+  background: rgba(15, 52, 96, 0.5);
+  border-color: rgba(233, 69, 96, 0.5);
+}
+
+.attack-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.attack-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f5f5f5;
+}
+
+.attack-bonus {
+  font-size: 0.875rem;
+  color: #4ade80;
+  font-weight: 600;
+  background: rgba(74, 222, 128, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+}
+
+.attack-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.attack-damage {
+  font-size: 0.875rem;
+  color: #fbbf24;
+  font-weight: 500;
+}
+
+.damage-type {
+  color: #ff6b9d;
+  margin-left: 0.25rem;
+}
+
+.attack-range {
+  font-size: 0.875rem;
+  color: #60a5fa;
+  font-weight: 500;
+}
+
+.attack-description {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .encounter-title {
+    font-size: 2rem;
+  }
+
+  .encounter-meta {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .creatures-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .attack-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .attack-details {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
